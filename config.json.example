@@ -1,0 +1,15 @@
+{
+  "discord_token": "YOUR_DISCORD_BOT_TOKEN",
+  "servers": [
+    {
+      "logfile_path": "path/to/your/logfile1.log",
+      "fifo_path": "path/to/your/fifo1",
+      "channel_id": "CHANNEL_ID_1"
+    },
+    {
+      "logfile_path": "path/to/your/logfile2.log",
+      "fifo_path": "path/to/your/fifo2",
+      "channel_id": "CHANNEL_ID_2"
+    }
+  ]
+}
