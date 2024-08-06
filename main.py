@@ -74,7 +74,7 @@ async def on_message(message):
 
     for server in servers:
         if message.channel.id == server['channel_id']:
-            with open(server['fifo_path'], 'a') as fifo:
+            with open(server['fifo_path'], 'w') as fifo:
                 fifo.write(f'{message.content}\n')
 
 client.run(discord_token)
