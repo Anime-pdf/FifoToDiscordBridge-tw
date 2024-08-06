@@ -10,6 +10,7 @@
 
 # Config
 Copy `config.json.example` and rename it to `config.json`.
+
 `servers` value is an array that should contain values with `logfile_path`, `fifo_path` and `channel_id`. Useful if you have multiple servers running at once.
 
 # Running
