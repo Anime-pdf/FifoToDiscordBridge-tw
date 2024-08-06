@@ -1,3 +1,4 @@
+import time
 import discord
 import json
 import os
@@ -25,13 +26,16 @@ class LogFileHandler(FileSystemEventHandler):
     
     def on_modified(self, event):
         if event.src_path == self.logfile_path:
-            with open(self.logfile_path, 'r') as f:
-                f.seek(self.last_position)
-                new_lines = f.readlines()
-                self.last_position = f.tell()
-                for line in new_lines:
-                    client.loop.create_task(self.send_message(line))
-
+            self.process_logfile()
+    
+    def process_logfile(self):
+        with open(self.logfile_path, 'r') as f:
+            f.seek(self.last_position)
+            new_lines = f.readlines()
+            self.last_position = f.tell()
+            for line in new_lines:
+                client.loop.create_task(self.send_message(line))
+    
     async def send_message(self, message):
         channel = client.get_channel(self.channel_id)
         await channel.send(message)
@@ -42,8 +46,12 @@ async def on_ready():
     observer = Observer()
     for server in servers:
         handler = LogFileHandler(server)
-        observer.schedule(handler, path=server['logfile_path'])
+        observer.schedule(handler, path=server['logfile_path'], recursive=False)
     observer.start()
+    # Polling loop to check for file changes more frequently
+    while True:
+        observer.dispatch_events()
+        time.sleep(0.1)  # Adjust sleep time for faster polling
 
 @client.event
 async def on_message(message):
