@@ -1,19 +1,28 @@
-import time
 import discord
 import json
 import os
+import asyncio
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+# Load configuration
 with open('config.json', 'r') as config_file:
     config = json.load(config_file)
 
 discord_token = config['discord_token']
 servers = config['servers']
 
+# Initialize the Discord client
 intents = discord.Intents.default()
 intents.messages = True
 client = discord.Client(intents=intents)
+
+def sanitize_message(message):
+    # Escape special Markdown characters used in Discord
+    escape_chars = ['\\', '_', '*', '~', '`', '|', '>', '(', ')', '[', ']']
+    for char in escape_chars:
+        message = message.replace(char, f'\\{char}')
+    return message
 
 class LogFileHandler(FileSystemEventHandler):
     def __init__(self, server):
@@ -34,7 +43,8 @@ class LogFileHandler(FileSystemEventHandler):
             new_lines = f.readlines()
             self.last_position = f.tell()
             for line in new_lines:
-                client.loop.create_task(self.send_message(line))
+                sanitized_line = sanitize_message(line)
+                client.loop.create_task(self.send_message(sanitized_line))
     
     async def send_message(self, message):
         channel = client.get_channel(self.channel_id)
@@ -48,10 +58,14 @@ async def on_ready():
         handler = LogFileHandler(server)
         observer.schedule(handler, path=server['logfile_path'], recursive=False)
     observer.start()
-    # Polling loop to check for file changes more frequently
-    while True:
-        observer.dispatch_events()
-        time.sleep(0.1)  # Adjust sleep time for faster polling
+    
+    # Keep the script running and let observer handle events
+    try:
+        while True:
+            await asyncio.sleep(0.1)  # Adjust sleep time if needed
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 @client.event
 async def on_message(message):
