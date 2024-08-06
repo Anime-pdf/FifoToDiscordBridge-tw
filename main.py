@@ -1,9 +1,17 @@
+import logging
 import discord
 import json
 import os
 import asyncio
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+
+# Configure logging
+log_formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+log_handler = logging.StreamHandler()  # Output to console
+log_handler.setFormatter(log_formatter)
+
+logging.basicConfig(level=logging.INFO, handlers=[log_handler])
 
 # Load configuration
 with open('config.json', 'r') as config_file:
@@ -15,6 +23,7 @@ servers = config['servers']
 # Initialize the Discord client
 intents = discord.Intents.default()
 intents.messages = True
+intents.message_content = True
 client = discord.Client(intents=intents)
 
 def sanitize_message(message):
@@ -52,7 +61,7 @@ class LogFileHandler(FileSystemEventHandler):
 
 @client.event
 async def on_ready():
-    print(f'Logged in as {client.user}')
+    logging.info(f'Logged in as {client.user}')
     observer = Observer()
     for server in servers:
         handler = LogFileHandler(server)
@@ -73,8 +82,12 @@ async def on_message(message):
         return
 
     for server in servers:
-        if message.channel.id == server['channel_id']:
-            with open(server['fifo_path'], 'w') as fifo:
-                fifo.write(f'{message.content}\n')
+        if str(message.channel.id).strip() == server['channel_id'].strip():
+            try:
+                with open(server['fifo_path'], 'w') as fifo:
+                    fifo.write(f'{message.content}\n')
+                    fifo.flush()  # Ensure data is written immediately
+            except Exception as e:
+                logging.info(f"Error writing to FIFO file: {e}")
 
 client.run(discord_token)
