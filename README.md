@@ -1,6 +1,6 @@
 # FIFO to Discord bridge
 
-**This python script will start discord bot that will pull lines from logfile and push lines to fifo file.**
+**This python script will start discord bot that will pull lines from logfile to send them over discord, and read messages from  discord to push them into fifo file.**
 
 # Requirments
 **You will need:**
@@ -9,9 +9,9 @@
  * Python3 with `discord.py` and `watchdog` packages installed
 
 # Config
-Copy `config.json.example` and rename it to `config.json`.
+Copy `config.json.example` and rename it to `config.json`. Replace values with your own.
 
-`servers` value is an array that should contain values with `logfile_path`, `fifo_path` and `channel_id`. Useful if you have multiple servers running at once.
+**Note: `servers` value is an array that should contain values with `logfile_path`, `fifo_path` and `channel_id`. Useful if you have multiple servers running at once.**
 
 # Running
 
