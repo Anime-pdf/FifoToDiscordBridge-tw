@@ -51,9 +51,11 @@ class LogFileHandler(FileSystemEventHandler):
             f.seek(self.last_position)
             new_lines = f.readlines()
             self.last_position = f.tell()
+            buffer = ""
             for line in new_lines:
                 sanitized_line = sanitize_message(line)
-                client.loop.create_task(self.send_message(sanitized_line))
+                buffer += sanitized_line
+            client.loop.create_task(self.send_message(buffer))
     
     async def send_message(self, message):
         channel = client.get_channel(self.channel_id)
@@ -71,7 +73,7 @@ async def on_ready():
     # Keep the script running and let observer handle events
     try:
         while True:
-            await asyncio.sleep(0.1)  # Adjust sleep time if needed
+            await asyncio.sleep(0.3)  # Adjust sleep time if needed
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
