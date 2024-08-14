@@ -63,3 +63,6 @@ For running your bot as a background service, you can create a systemd service f
    ```sh
    sudo systemctl status discord-bot.service
    ```
+
+# Showcase
+![example](https://github.com/user-attachments/assets/544b3899-48e6-4b2b-99b4-226216f0f8b3)
