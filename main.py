@@ -60,7 +60,8 @@ async def on_message(message: nextcord.Message):
     
     if message.channel.id == int(broadcast_channel):
         for server in servers:
-            send_fifo(server['fifo_path'], message.content)
+            if int(server['broadcast']):
+                send_fifo(server['fifo_path'], message.content)
         return
 
     for server in servers:
