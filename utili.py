@@ -1,7 +1,17 @@
+import logging
 import os
 
 import nextcord
 from watchdog.events import FileSystemEventHandler
+
+
+def send_fifo(fifo_path, message):
+    try:
+        with open(fifo_path, 'w', encoding='utf-8') as fifo:
+            fifo.write(f'{message}\n')
+            fifo.flush()  # Ensure data is written immediately
+    except IOError as ex:
+        logging.info("Error writing to FIFO file: %s", ex)
 
 
 def sanitize_message(message: str) -> str:
@@ -10,7 +20,7 @@ def sanitize_message(message: str) -> str:
     :param message: str
     :return: str
     """
-    escape_chars = ['\\', '_', '*', '~', '`', '|', '>', '(', ')', '[', ']']
+    escape_chars = ['\\', '_', '*', '~', '`', '|', '<', '>', '(', ')', '[', ']']
     for char in escape_chars:
         message = message.replace(char, f'\\{char}')
     return message

@@ -6,7 +6,7 @@ import asyncio
 import nextcord
 from watchdog.observers import Observer
 
-from utili import LogFileHandler
+from utili import LogFileHandler, send_fifo
 
 # Load configuration
 # For convenience, use PyYAML
@@ -24,10 +24,13 @@ log_handler.setFormatter(log_formatter)
 logging.basicConfig(level=logging.INFO, handlers=[log_handler])
 
 # Initialize the Discord client
-client = nextcord.Client(intents=nextcord.Intents.all())
+intents=nextcord.Intents.default()
+intents.message_content = True
+client = nextcord.Client(intents=intents)
 
 # Additional variables
 servers = config['servers']
+broadcast_channel = config['broadcast_channel']
 observer = Observer()
 
 
@@ -35,6 +38,8 @@ observer = Observer()
 async def on_ready():
     logging.info('Logged in as %s', client.user)
     for server in servers:
+        if int(server['mode']) != 1 and int(server['mode']) != 3:
+            continue
         handler = LogFileHandler(client, server)
         observer.schedule(handler, path=server['logfile_path'], recursive=False)
     observer.start()
@@ -49,19 +54,19 @@ async def on_ready():
 
 
 @client.event
-async def on_message(message):
-    if message.bot:
+async def on_message(message: nextcord.Message):
+    if message.author.bot:
+        return
+    
+    if message.channel.id == int(broadcast_channel):
+        for server in servers:
+            send_fifo(server['fifo_path'], message.content)
         return
 
     for server in servers:
         if message.channel.id != int(server['channel_id']):
             continue
-        try:
-            with open(server['fifo_path'], 'w', encoding='utf-8') as fifo:
-                fifo.write(f'{message.content}\n')
-                fifo.flush()  # Ensure data is written immediately
-        except IOError as ex:
-            logging.info("Error writing to FIFO file: %s", ex)
+        send_fifo(server['fifo_path'], message.content)
 
 
 client.run(config.get('discord_token', os.getenv("discord_token")))

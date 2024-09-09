@@ -4,12 +4,15 @@
     {
       "logfile_path": "path/to/your/logfile1.log",
       "fifo_path": "path/to/your/fifo1",
-      "channel_id": "CHANNEL_ID_1"
+      "channel_id": "CHANNEL_ID_1",
+      "mode": "0/1/2/3", 0 - none (broadcast will still work), 1 - logs only, 2 - fifo only, 3 - both
     },
     {
       "logfile_path": "path/to/your/logfile2.log",
       "fifo_path": "path/to/your/fifo2",
-      "channel_id": "CHANNEL_ID_2"
+      "channel_id": "CHANNEL_ID_2",
+      "mode": "0/1/2/3", 0 - none (broadcast will still work), 1 - logs only, 2 - fifo only, 3 - both
     }
-  ]
+  ],
+  "broadcast_channel": "CHANNEL_ID_3",
 }
