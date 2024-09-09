@@ -6,12 +6,12 @@
 **You will need:**
  * DDNet/Teeworlds server with `logfile path/to/logfile` and `sv_input_fifo path/to/fifo`
  * Discord bot with message content intent
- * Python3 with `discord.py` and `watchdog` packages installed
+ * Python3 with `nextcord` and `watchdog` packages installed
 
 # Config
 Copy `config.json.example` and rename it to `config.json`. Replace values with your own.
 
-**Note: `servers` value is an array that should contain values with `logfile_path`, `fifo_path` and `channel_id`. Useful if you have multiple servers running at once.**
+**Note: `servers` value is an array that should contain values with `logfile_path`, `fifo_path`, `channel_id`, `broadcast` and `mode`. Useful if you have multiple servers running at once.**
 
 # Running
 
@@ -21,7 +21,7 @@ sudo apt install python3-venv
 cd path/to/bot
 python3 -m venv venv
 source venv/bin/activate
-pip install discord.py watchdog
+pip install nextcord watchdog
 python main.py
 deactivate
 ```
