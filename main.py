@@ -47,10 +47,10 @@ async def on_ready():
     # Keep the script running and let observer handle events
     try:  # you can use atexit
         while True:
-            await asyncio.sleep(0.3)  # Adjust sleep time if needed
-    except KeyboardInterrupt:
+            await asyncio.sleep(3)  # Adjust sleep time if needed
+    finally:
         observer.stop()
-    observer.join()
+        observer.join()
 
 
 @client.event
